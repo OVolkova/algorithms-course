@@ -1,8 +1,5 @@
 import os
-from tree_height import TreeHeight
-
-import sys
-import threading
+from build_heap import Heap
 
 
 def iter_tests():
@@ -17,14 +14,15 @@ def iter_tests():
         print(test)
         with open(os.path.join('./tests', test), 'r') as file:
             n = int(file.readline().strip())
-            parents = list(map(int, file.readline().split()))
-            data = (n, parents)
+            data = list(map(int, file.readline().split()))
 
         with open(os.path.join('./tests', answer), 'r') as file:
-            a = file.readline()
-            result = int(a)
+            m = int(file.readline())
+            swaps = []
+            for i in range(0, m):
+                swaps.append(tuple([int(i) for i in file.readline().strip().split(' ')]))
 
-        yield data, result
+        yield data, n, swaps, m
 
 
 def main():
@@ -33,18 +31,18 @@ def main():
     iterate = True
     while iterate:
         try:
-            data, result = next(Test)
-            tree = TreeHeight(data[0], data[1])
-            print(i, result, tree.compute_height())
+            data, n, swaps, m = next(Test)
 
-            assert result == tree.compute_height()
+            heap = Heap(data, n)
+            heap.build_heap()
+            print(i, n, m, heap.swaps_counter, 4*n)
+
+            assert heap.swaps_counter == m
+            assert heap.swaps == swaps
             i += 1
         except StopIteration:
             iterate = False
 
 
-sys.setrecursionlimit(10 ** 7)  # max depth of recursion
-threading.stack_size(2 ** 27)  # new thread will get stack of such size
-threading.Thread(target=main).start()
-
-
+if __name__ == '__main__':
+    main()
